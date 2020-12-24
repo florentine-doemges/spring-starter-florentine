@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "net.doemges"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.13"
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -45,6 +45,12 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.withType<Jar> {
+    from("./META-INF/"){
+        include("spring.factories")
+        into("META-INF")
+    }
+}
 
 
 
