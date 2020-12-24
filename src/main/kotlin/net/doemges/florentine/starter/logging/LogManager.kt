@@ -1,21 +1,36 @@
 package net.doemges.florentine.starter.logging
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.config.BeanDefinition.SCOPE_PROTOTYPE
-import org.springframework.context.annotation.Scope
-import org.springframework.stereotype.Component
 
-class LogManager {
-    val log: Logger = getLogger()
+class LogManager(
+    private val objectMapper: ObjectMapper
+) : HasLogger {
+
+    private val classMap: MutableMap<Class<*>, Logger> = mutableMapOf()
 
     init {
-        log.info("LogManager started")
+        info { "LogManager started" }
+        info { this }
     }
 
-    fun getLogger(): Logger {
-        val clazz = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
-            .callerClass
-        return LoggerFactory.getLogger(clazz)
+    override fun getLogger(): Logger = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
+        .callerClass.let { clazz -> classMap[clazz] ?: LoggerFactory.getLogger(clazz).also { classMap[clazz] = it } }
+
+    fun <T : HasLogger, F> T.info(block: (T) -> F): T {
+        return block(this).also {
+            when (it) {
+                is String -> getLogger().info(it)
+                else -> getLogger().info(objectMapper.writeValueAsString(it))
+            }
+        }.let { this }
     }
 }
+
+interface HasLogger {
+    fun getLogger(): Logger
+}
+
+
+
