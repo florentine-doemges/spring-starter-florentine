@@ -1,1 +1,1 @@
-rootProject.name = "spring-starter-florentine-demoapp"
+rootProject.name = "spring-starter-florentine"
