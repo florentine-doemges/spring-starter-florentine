@@ -15,6 +15,9 @@ class LogManager(
         info { this }
     }
 
+    override val logManager: LogManager
+        get() = this
+
     override fun getLogger(): Logger = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
         .callerClass.let { clazz -> classMap[clazz] ?: LoggerFactory.getLogger(clazz).also { classMap[clazz] = it } }
 
@@ -29,7 +32,8 @@ class LogManager(
 }
 
 interface HasLogger {
-    fun getLogger(): Logger
+    val logManager:LogManager
+    fun getLogger(): Logger = logManager.getLogger()
 }
 
 
