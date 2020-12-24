@@ -44,3 +44,8 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+val myJar by tasks.registering(Jar::class)
+
+artifacts {
+    add("archives", myJar)
+}
